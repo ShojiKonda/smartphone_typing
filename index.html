@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>問いへの文字入力歩行課題</title>
+  <title>文字入力歩行課題</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -160,7 +160,7 @@
 </head>
 <body>
   <div class="top">
-    <span id="title">問いへの文字入力歩行課題</span>
+    <span id="title">文字入力歩行課題</span>
     <span id="time">待機中</span>
   </div>
 
@@ -168,14 +168,14 @@
     <section id="startScreen" class="start-card">
       <div class="start-title">文字入力歩行課題</div>
       <div class="start-sub">
-        スタートを押すと3秒後に開始します。<br>
+        スタートを押すと5秒後に開始します。<br>
         歩きながら、表示された問いに短く答えてください。
       </div>
       <button id="startBtn" class="start">スタート</button>
       <button id="fullscreenStart" class="secondary">全画面</button>
     </section>
 
-    <div id="countdown" class="countdown" style="display:none;">3</div>
+    <div id="countdown" class="countdown" style="display:none;">5</div>
 
     <section id="task" style="display:none;">
       <div id="question" class="question"></div>
@@ -188,12 +188,11 @@
     </section>
 
     <div id="end" style="display:none;">
-      <div class="message">終了<br>安全に停止してください</div>
+      <div class="message">終了</div>
     </div>
 
     <div class="button-row" id="bottomButtons" style="display:none;">
       <button id="restart">もう一度実施</button>
-      <button id="fullscreen" class="secondary">全画面</button>
     </div>
   </main>
 
