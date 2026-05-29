@@ -172,7 +172,6 @@
         歩きながら、表示された問いに短く答えてください。
       </div>
       <button id="startBtn" class="start">スタート</button>
-      <button id="fullscreenStart" class="secondary">全画面</button>
     </section>
 
     <div id="countdown" class="countdown" style="display:none;">5</div>
@@ -183,7 +182,6 @@
       <div class="answer-panel">
         <button id="next">回答して次へ</button>
         <input id="answer" autocomplete="off" autocorrect="off" autocapitalize="off" inputmode="text" placeholder="短く入力">
-        <div class="sub">入力内容は保存されません</div>
       </div>
     </section>
 
@@ -199,6 +197,7 @@
   <script>
     const QUESTIONS = [
       "今日の朝食は？",
+      "昨日の夕食は？",
       "好きなスポーツは？",
       "通学手段は？",
       "好きな色は？",
@@ -218,7 +217,6 @@
       "行ってみたい国は？",
       "行ってみたい都道府県は？",
       "休日にしたいことは？",
-      "今の気分を一言で",
       "今日の体調を一言で",
       "最近楽しかったことは？",
       "大学生活で楽しみなことは？",
@@ -258,7 +256,6 @@
       "運動の名前を一つ",
       "スポーツ名を一つ",
       "体の部位を一つ",
-      "足に関係する言葉を一つ",
       "健康に関係する言葉を一つ"
     ];
 
