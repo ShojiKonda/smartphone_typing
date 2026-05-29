@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>問いへの文字入力歩行課題（質問ランダム版）</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #111827;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .screen {
+      width: 100%;
+      max-width: 900px;
+      min-height: 90svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+    .top {
+      position: fixed;
+      top: env(safe-area-inset-top, 0);
+      left: 0;
+      right: 0;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      color: #4b5563;
+    }
+    .question {
+      min-height: 34svh;
+      border: 2px solid #d1d5db;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      font-size: clamp(34px, 9vw, 72px);
+      font-weight: 800;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    input {
+      width: 100%;
+      border: 2px solid #9ca3af;
+      border-radius: 18px;
+      padding: 18px;
+      font-size: clamp(26px, 7vw, 48px);
+      text-align: center;
+    }
+    button {
+      font: inherit;
+      border: 0;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      background: #2563eb;
+    }
+    button.secondary { background: #374151; }
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .countdown {
+      font-size: clamp(72px, 24vw, 180px);
+      font-weight: 900;
+      text-align: center;
+    }
+    .message {
+      font-size: clamp(28px, 8vw, 64px);
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .sub {
+      text-align: center;
+      color: #6b7280;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span id="title">問いへの文字入力歩行課題</span>
+    <span id="time">準備</span>
+  </div>
+
+  <main class="screen">
+    <div id="countdown" class="countdown">3</div>
+
+    <section id="task" style="display:none;">
+      <div id="question" class="question"></div>
+      <input id="answer" autocomplete="off" inputmode="text" placeholder="短く入力">
+      <button id="next" style="width:100%; margin-top:14px;">回答して次へ</button>
+      <div class="sub" style="margin-top:10px;">入力内容は保存されません</div>
+    </section>
+
+    <div id="end" style="display:none;">
+      <div class="message">終了</div>
+      <div class="sub">安全に停止してください</div>
+    </div>
+
+    <div class="button-row">
+      <button id="restart">もう一度実施</button>
+      <button id="fullscreen" class="secondary">全画面</button>
+    </div>
+  </main>
+
+  <script>
+    // ===== ここを書き換えると課題内容を変更できます =====
+    const QUESTIONS = [
+      "今日の朝食は？",
+      "好きなスポーツは？",
+      "通学手段は？",
+      "好きな色は？",
+      "好きな季節は？",
+      "好きな食べ物は？",
+      "苦手な食べ物は？",
+      "好きな飲み物は？",
+      "好きな果物は？",
+      "好きな動物は？",
+      "好きな曜日は？",
+      "好きな天気は？",
+      "好きな教科は？",
+      "好きな音楽は？",
+      "好きな映画は？",
+      "好きな本は？",
+      "好きな場所は？",
+      "行ってみたい国は？",
+      "行ってみたい都道府県は？",
+      "休日にしたいことは？",
+      "今の気分を一言で",
+      "今日の体調を一言で",
+      "最近楽しかったことは？",
+      "大学生活で楽しみなことは？",
+      "運動は好きですか？",
+      "歩くのは好きですか？",
+      "普段よく使う交通手段は？",
+      "スマホをよく使う場面は？",
+      "よく使うアプリは？",
+      "朝型ですか夜型ですか？",
+      "犬派ですか猫派ですか？",
+      "海派ですか山派ですか？",
+      "夏派ですか冬派ですか？",
+      "和食派ですか洋食派ですか？",
+      "ご飯派ですかパン派ですか？",
+      "好きな数字は？",
+      "今日の日付は？",
+      "今は何月ですか？",
+      "1 + 2 は？",
+      "3 + 4 は？",
+      "5 + 6 は？",
+      "10 - 3 は？",
+      "12 - 5 は？",
+      "2 × 3 は？",
+      "4 × 2 は？",
+      "8 ÷ 2 は？",
+      "赤いものを一つ",
+      "青いものを一つ",
+      "丸いものを一つ",
+      "四角いものを一つ",
+      "学校にあるものを一つ",
+      "体育館にあるものを一つ",
+      "今見えるものを一つ",
+      "今日持ってきたものを一つ",
+      "朝にすることを一つ",
+      "夜にすることを一つ",
+      "運動の名前を一つ",
+      "スポーツ名を一つ",
+      "体の部位を一つ",
+      "足に関係する言葉を一つ",
+      "健康に関係する言葉を一つ"
+    ];
+
+    const COUNTDOWN_SEC = 10;
+    const TASK_DURATION_SEC = 120;
+    // ===============================================
+
+    let countdownTimer = null;
+    let taskTimer = null;
+    let startTime = 0;
+    let shuffledQuestions = [];
+    let index = 0;
+
+    const countdownEl = document.getElementById("countdown");
+    const taskEl = document.getElementById("task");
+    const questionEl = document.getElementById("question");
+    const answerEl = document.getElementById("answer");
+    const endEl = document.getElementById("end");
+    const timeEl = document.getElementById("time");
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function prepareQuestions() {
+      shuffledQuestions = shuffleArray(QUESTIONS);
+      index = 0;
+    }
+
+    function showCountdown() {
+      clearAllTimers();
+      prepareQuestions();
+      taskEl.style.display = "none";
+      endEl.style.display = "none";
+      countdownEl.style.display = "block";
+      timeEl.textContent = "準備";
+
+      let remaining = COUNTDOWN_SEC;
+      countdownEl.textContent = remaining;
+
+      countdownTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(countdownTimer);
+          countdownEl.textContent = "開始";
+          setTimeout(startTask, 500);
+        } else {
+          countdownEl.textContent = remaining;
+        }
+      }, 1000);
+    }
+
+    function startTask() {
+      startTime = performance.now();
+      countdownEl.style.display = "none";
+      endEl.style.display = "none";
+      taskEl.style.display = "block";
+      showQuestion();
+
+      taskTimer = setInterval(updateTime, 100);
+      updateTime();
+
+      setTimeout(() => answerEl.focus(), 100);
+    }
+
+    function showQuestion() {
+      if (index >= shuffledQuestions.length) {
+        shuffledQuestions = shuffleArray(QUESTIONS);
+        index = 0;
+      }
+      questionEl.textContent = shuffledQuestions[index];
+      answerEl.value = "";
+      answerEl.focus();
+    }
+
+    function nextQuestion() {
+      index += 1;
+      if ((performance.now() - startTime) / 1000 >= TASK_DURATION_SEC) {
+        finishTask();
+      } else {
+        showQuestion();
+      }
+    }
+
+    function updateTime() {
+      const elapsed = (performance.now() - startTime) / 1000;
+      const remaining = Math.max(0, Math.ceil(TASK_DURATION_SEC - elapsed));
+      timeEl.textContent = `残り ${remaining} 秒`;
+      if (elapsed >= TASK_DURATION_SEC) finishTask();
+    }
+
+    function finishTask() {
+      clearAllTimers();
+      taskEl.style.display = "none";
+      countdownEl.style.display = "none";
+      endEl.style.display = "block";
+      timeEl.textContent = "終了";
+    }
+
+    function clearAllTimers() {
+      clearInterval(countdownTimer);
+      clearInterval(taskTimer);
+    }
+
+    async function fullscreen() {
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      } catch {}
+    }
+
+    document.getElementById("next").addEventListener("click", nextQuestion);
+    answerEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") nextQuestion();
+    });
+    document.getElementById("restart").addEventListener("click", showCountdown);
+    document.getElementById("fullscreen").addEventListener("click", fullscreen);
+
+    window.addEventListener("load", showCountdown);
+  </script>
+</body>
+</html>
